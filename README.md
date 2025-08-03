@@ -41,7 +41,7 @@ This is a web-based project for managing blood donors, requests, and administrat
 ## Technologies Used
 
 - HTML5, CSS3, Bootstrap 5
-- Python 3.x
+- Python 3
 - Flask (Web Framework)
 - SQLite (Database)
 - Flask-WTF, Flask-Login, Flask-Mail, Flask-RESTful
