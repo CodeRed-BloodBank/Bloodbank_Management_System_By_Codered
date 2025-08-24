@@ -1,8 +1,11 @@
 /* ========== style.css ========== */
 
 /* Hero Section */
+.nav-link {
+  color: #fff;
+}
 .hero {
-  background: url('../images/hero-bg.jpg') center/cover no-repeat;
+  background: url('../images/blood_Bank_bg.jpeg') center/cover no-repeat;
   color: #ffffff;
   padding: 120px 0;
   text-shadow: 0 1px 5px rgba(0, 0, 0, 0.6);
