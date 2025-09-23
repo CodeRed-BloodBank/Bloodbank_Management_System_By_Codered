@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Search Results – RoktoNet</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .avatar-sm { width:56px; height:56px; object-fit:cover; border-radius:50%; }
+    .muted-small { font-size:0.9rem; color:#6c757d; }
+    .clickable { cursor:pointer; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><i class="bi bi-heart-fill me-1"></i>RoktoNet</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="donor_register.html"><i class="bi bi-person-plus me-1"></i>Donor</a></li>
+          <li class="nav-item"><a class="nav-link" href="recipient_register.html"><i class="bi bi-person-heart me-1"></i>Recipient</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="flex-grow-1 container py-4">
+
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">Search Results</h4>
+      <small class="text-muted" id="resultsSummary">Loading...</small>
+    </div>
+
+    <!-- Search & filters -->
+    <form id="searchForm" class="row g-2 mb-3" onsubmit="return false">
+      <div class="col-md-5">
+        <input id="q" class="form-control" type="search" placeholder="Search name, phone, email" />
+      </div>
+      <div class="col-md-2">
+        <select id="blood_group" class="form-select">
+          <option value="">All blood groups</option>
+          <option value="A+">A+</option><option value="A-">A−</option>
+          <option value="B+">B+</option><option value="B-">B−</option>
+          <option value="O+">O+</option><option value="O-">O−</option>
+          <option value="AB+">AB+</option><option value="AB-">AB−</option>
+        </select>
+      </div>
+      <div class="col-md-2">
+        <select id="district" class="form-select">
+          <option value="">All districts</option>
+          <option>Dhaka</option><option>Chattogram</option><option>Sylhet</option><option>Rajshahi</option>
+        </select>
+      </div>
+      <div class="col-md-1 d-grid">
+        <button id="searchBtn" class="btn btn-danger" type="button"><i class="bi bi-search"></i></button>
+      </div>
+      <div class="col-md-2 d-flex justify-content-end">
+        <button id="clearBtn" class="btn btn-outline-secondary">Clear</button>
+      </div>
+    </form>
+
+    <div class="row">
+      <!-- Results list -->
+      <div class="col-lg-8">
+        <div id="resultsGrid" class="list-group">
+          <noscript>
+            <div class="alert alert-warning">Enable JavaScript to load live search results. Static example shown below.</div>
+            <a class="list-group-item list-group-item-action" href="donor/42.html">
+              <div class="d-flex align-items-center">
+                <img src="/static/images/avatar-placeholder.png" alt="" class="avatar-sm me-3">
+                <div>
+                  <strong>John Doe</strong>
+                  <div class="muted-small">B+ • Chattogram • Last donation: 2025-08-15</div>
+                </div>
+              </div>
+            </a>
+          </noscript>
+        </div>
+
+        <!-- Pagination -->
+        <nav id="paginationNav" class="mt-4" aria-label="Pagination"></nav>
+      </div>
+
+      <!-- Sidebar: quick filters & legend -->
+      <aside class="col-lg-4">
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-title">Quick Filters</h6>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-danger" type="button" data-bg="O+">O+ donors</button>
+              <button class="btn btn-outline-danger" type="button" data-bg="A+">A+ donors</button>
+              <button class="btn btn-outline-danger" type="button" data-bg="B+">B+ donors</button>
+              <button class="btn btn-outline-secondary" id="resetQuick">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card mb-3">
+          <div class="card-body">
+            <h6 class="card-title">Dev tools (frontend-only)</h6>
+            <p class="muted-small mb-2">Use these during development if backend is not ready.</p>
+            <div class="d-grid gap-2">
+              <button id="useMockBtn" class="btn btn-sm btn-outline-primary">Use Local Mock JSON</button>
+              <button id="useSampleBtn" class="btn btn-sm btn-outline-primary">Use Embedded Sample Data</button>
+              <button id="showFetchLog" class="btn btn-sm btn-outline-secondary">Show Last Fetch Info</button>
+            </div>
+            <pre id="fetchLog" class="small mt-2" style="display:none; white-space:pre-wrap;"></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-body">
+            <h6 class="card-title">Legend</h6>
+            <p class="muted-small mb-0">Click a donor to view full profile. Contact info may be hidden for privacy until you authenticate.</p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container d-flex flex-column flex-md-row justify-content-between">
+      <div>
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="index.html" class="text-white">Home</a></li>
+          <li><a href="donor_register.html" class="text-white">Become a Donor</a></li>
+          <li><a href="recipient_register.html" class="text-white">Make a Request</a></li>
+        </ul>
+      </div>
+      <div class="text-md-end mt-3 mt-md-0">
+        <p class="mb-1">&copy; 2025 RoktoNet. All rights reserved.</p>
+        <a href="privacy.html" class="text-white me-2">Privacy Policy</a>
+        <a href="terms.html" class="text-white">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Page JS: frontend-only search rendering with quick fixes and diagnostics -->
+  <script>
+    // Default API path (change if backend uses another path)
+    let API = '/api/donors'; // expected query params: page, per_page, q, blood_group, district
+    let useMock = false;     // if true, fetch /static/mock/donors.json
+    let useSample = false;   // if true, use embedded sample data (no network)
+
+    const resultsGrid = document.getElementById('resultsGrid');
+    const paginationNav = document.getElementById('paginationNav');
+    const resultsSummary = document.getElementById('resultsSummary');
+    const qInput = document.getElementById('q');
+    const bloodInput = document.getElementById('blood_group');
+    const districtInput = document.getElementById('district');
+    const searchBtn = document.getElementById('searchBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    const useMockBtn = document.getElementById('useMockBtn');
+    const useSampleBtn = document.getElementById('useSampleBtn');
+    const showFetchLog = document.getElementById('showFetchLog');
+    const fetchLog = document.getElementById('fetchLog');
+
+    let lastFetchInfo = null; // store last fetch diagnostic info for dev
+    let state = { page:1, per_page:10, total:0, results:[] };
+
+    function esc(s){ return s==null ? '' : String(s); }
+
+    // Primary loader: picks method based on flags
+    async function loadResults() {
+      if (useSample) { sampleLoad(); return; }
+
+      const params = new URLSearchParams();
+      params.set('page', state.page);
+      params.set('per_page', state.per_page);
+      if (qInput.value) params.set('q', qInput.value.trim());
+      if (bloodInput.value) params.set('blood_group', bloodInput.value);
+      if (districtInput.value) params.set('district', districtInput.value);
+
+      resultsGrid.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-danger" role="status"></div></div>';
+      resultsSummary.textContent = 'Searching...';
+
+      // choose URL based on useMock flag
+      const url = useMock ? `/static/mock/donors.json?${params.toString()}` : `${API}?${params.toString()}`;
+      lastFetchInfo = { url, timestamp: new Date().toISOString(), status: null, ok: null, responseText: null };
+
+      try {
+        const res = await fetch(url, { method: 'GET' });
+        lastFetchInfo.status = res.status;
+        lastFetchInfo.ok = res.ok;
+
+        // try to capture raw text for diagnostics (but avoid huge bodies)
+        const text = await res.text().catch(()=>null);
+        lastFetchInfo.responseText = text && text.length < 20000 ? text : (text ? text.slice(0,2000) + '... (truncated)' : null);
+
+        if (!res.ok) {
+          // show backend response text to help debugging (if safe)
+          console.error('Fetch failed', lastFetchInfo);
+          resultsGrid.innerHTML = `<div class="alert alert-danger">Could not load results. Server responded with status ${res.status}.</div>`;
+          paginationNav.innerHTML = '';
+          resultsSummary.textContent = '';
+          return;
+        }
+
+        // parse JSON (some servers return text; handle parse errors)
+        let data;
+        try {
+          data = JSON.parse(text || '{}');
+        } catch (e) {
+          console.error('Invalid JSON from API', lastFetchInfo);
+          resultsGrid.innerHTML = '<div class="alert alert-danger">Invalid JSON returned by API. Check server response (see console / Dev tools).</div>';
+          paginationNav.innerHTML = '';
+          resultsSummary.textContent = '';
+          return;
+        }
+
+        // Expected contract: { total, page, per_page, donors: [] }
+        state.total = data.total || 0;
+        state.page = data.page || state.page;
+        state.per_page = data.per_page || state.per_page;
+        state.results = data.donors || data.results || [];
+        renderResults();
+      } catch (err) {
+        console.error('Network or fetch error', err, lastFetchInfo);
+        resultsGrid.innerHTML = '<div class="alert alert-danger">Could not load results. Check the API endpoint and network (see console).</div>';
+        paginationNav.innerHTML = '';
+        resultsSummary.textContent = '';
+        lastFetchInfo.error = String(err);
+      }
+    }
+
+    function renderResults() {
+      resultsGrid.innerHTML = '';
+      if (!state.results.length) {
+        resultsGrid.innerHTML = '<div class="alert alert-info">No donors found for these filters.</div>';
+        paginationNav.innerHTML = '';
+        resultsSummary.textContent = `0 results`;
+        return;
+      }
+
+      resultsSummary.textContent = `${state.total} results`;
+
+      state.results.forEach(d => {
+        const a = document.createElement('a');
+        a.className = 'list-group-item list-group-item-action d-flex align-items-center';
+        a.href = `/donor/${d.id || ''}`;
+        a.innerHTML = `
+          <img src="${esc(d.avatar_url || '/static/images/avatar-placeholder.png')}" class="avatar-sm me-3" alt="">
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between">
+              <div><strong>${esc(d.full_name)}</strong><div class="muted-small">${esc(d.blood_group || '')} • ${esc(d.district || '')}</div></div>
+              <div class="muted-small text-end">${esc(d.last_donation || 'N/A')}</div>
+            </div>
+            <div class="muted-small mt-2">${esc(d.phone ? d.phone : 'Contact hidden')}</div>
+          </div>`;
+        resultsGrid.appendChild(a);
+      });
+
+      renderPagination();
+    }
+
+    function renderPagination() {
+      const pages = Math.ceil(state.total / state.per_page) || 1;
+      let html = '<ul class="pagination justify-content-center">';
+      html += `<li class="page-item ${state.page<=1?'disabled':''}"><a class="page-link" href="#" data-page="${state.page-1}">Previous</a></li>`;
+      for (let p=1;p<=pages;p++){
+        html += `<li class="page-item ${p===state.page?'active':''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+      }
+      html += `<li class="page-item ${state.page>=pages?'disabled':''}"><a class="page-link" href="#" data-page="${state.page+1}">Next</a></li>`;
+      html += '</ul>';
+      paginationNav.innerHTML = html;
+
+      paginationNav.querySelectorAll('a.page-link').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          e.preventDefault();
+          const p = parseInt(a.getAttribute('data-page'));
+          const totalPages = Math.ceil(state.total / state.per_page) || 1;
+          if (!isNaN(p) && p>=1 && p<=totalPages) {
+            state.page = p;
+            loadResults();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      });
+    }
+
+    // Sample embedded data for frontend-only testing (no network)
+    function sampleLoad() {
+      state.total = 3; state.page=1; state.per_page=10;
+      state.results = [
+        {id:1, full_name:'John Doe', blood_group:'B+', district:'Chattogram', last_donation:'2025-08-15', phone:'+8801XXXXXXXXX', avatar_url:'/static/images/avatar-placeholder.png'},
+        {id:2, full_name:'Anika Rahman', blood_group:'A+', district:'Dhaka', last_donation:'2025-07-01', phone:'+8801XXXXXXXXX', avatar_url:'/static/images/avatar-placeholder.png'},
+        {id:3, full_name:'Karim Hossain', blood_group:'O-', district:'Sylhet', last_donation:null, phone:null, avatar_url:'/static/images/avatar-placeholder.png'}
+      ];
+      renderResults();
+      lastFetchInfo = { mode:'sample', timestamp: new Date().toISOString(), note:'sampleLoad used (no network)' };
+    }
+
+    // Dev controls wiring
+    document.querySelectorAll('button[data-bg]').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        bloodInput.value = btn.getAttribute('data-bg');
+        state.page = 1;
+        loadResults();
+      });
+    });
+    document.getElementById('resetQuick').addEventListener('click', ()=>{
+      bloodInput.value = ''; districtInput.value = ''; qInput.value = ''; state.page = 1; loadResults();
+    });
+
+    searchBtn.addEventListener('click', ()=> { state.page = 1; loadResults(); });
+    clearBtn.addEventListener('click', (e)=>{ e.preventDefault(); qInput.value=''; bloodInput.value=''; districtInput.value=''; state.page=1; loadResults(); });
+    qInput.addEventListener('keydown', (e)=>{ if (e.key==='Enter'){ e.preventDefault(); state.page=1; loadResults(); } });
+
+    useMockBtn.addEventListener('click', ()=>{
+      useMock = true; useSample = false;
+      useMockBtn.classList.add('active');
+      useSampleBtn.classList.remove('active');
+      API = '/api/donors';
+      loadResults();
+    });
+    useSampleBtn.addEventListener('click', ()=>{
+      useSample = true; useMock = false;
+      useSampleBtn.classList.add('active');
+      useMockBtn.classList.remove('active');
+      loadResults();
+    });
+    showFetchLog.addEventListener('click', ()=>{
+      fetchLog.style.display = fetchLog.style.display === 'none' ? 'block' : 'none';
+      fetchLog.textContent = JSON.stringify(lastFetchInfo, null, 2);
+    });
+
+    // Helpful console message to guide devs
+    console.info('Search page loaded. If API is not ready use "Use Local Mock JSON" (place /static/mock/donors.json) or "Use Embedded Sample Data".');
+
+    document.addEventListener('DOMContentLoaded', ()=> {
+      // initial load: try real API first; if it fails, use sample fallback
+      loadResults().then(()=>{
+        if (lastFetchInfo && lastFetchInfo.ok === false) {
+          // if API exists but returned error, keep that visible; developer can toggle mock/sample
+          console.warn('API fetch returned non-OK. Toggle mock/sample in the Dev tools panel on the right.');
+        }
+      });
+    });
+
+    // Small helper: allow loading a static mock file at /static/mock/donors.json
+    // Create that file during dev if you want to simulate backend: it should contain the same contract
+    // Example /static/mock/donors.json:
+    // {
+    //   "total":3, "page":1, "per_page":10,
+    //   "donors":[
+    //     {"id":1,"full_name":"John Doe","blood_group":"B+","district":"Chattogram","last_donation":"2025-08-15","phone":"+8801...","avatar_url":"/static/images/avatar-placeholder.png"},
+    //     ... 
+    //   ]
+    // }
+
+  </script>
+</body>
+</html>

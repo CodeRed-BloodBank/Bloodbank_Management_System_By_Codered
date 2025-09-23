@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Dashboard – RoktoNet</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .stat-card { min-height:100px; }
+    .muted-small { font-size:0.9rem; color:#6c757d; }
+    .table-actions .btn { padding: .25rem .5rem; }
+    .badge-pending { background:#ffc107; color:#000; }
+    .badge-approved { background:#198754; color:#fff; }
+    .badge-rejected { background:#dc3545; color:#fff; }
+    .scroll-box { max-height:300px; overflow:auto; }
+    .small-muted { font-size:0.85rem; color:#6c757d; }
+    .btn-outline-danger {margin-top: 5px}
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3" href="index.html"><i class="bi bi-heart-fill me-1"></i>RoktoNet Admin</a>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto me-3">
+          <li class="nav-item"><a class="nav-link" href="admin_dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="donors.html"><i class="bi bi-people me-1"></i>Donors</a></li>
+          <li class="nav-item"><a class="nav-link" href="requests.html"><i class="bi bi-file-earmark-text me-1"></i>Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="inventory.html"><i class="bi bi-droplet-half me-1"></i>Inventory</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin_login.html"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="flex-grow-1 container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">Admin Dashboard</h3>
+      <div class="small-muted">Welcome back, Admin</div>
+    </div>
+
+    <!-- Top stats -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h5 class="mb-1">Active Donors</h5>
+                <div class="h3 mb-0" id="stat-donors">134</div>
+                <div class="muted-small">registered & active</div>
+              </div>
+              <div class="text-danger display-6"><i class="bi bi-people-fill"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h5 class="mb-1">Open Requests</h5>
+                <div class="h3 mb-0" id="stat-requests">20</div>
+                <div class="muted-small">awaiting match/approval</div>
+              </div>
+              <div class="text-danger display-6"><i class="bi bi-inbox-fill"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h5 class="mb-1">Units in Inventory</h5>
+                <div class="h3 mb-0" id="stat-units">96</div>
+                <div class="muted-small">total across blood groups</div>
+              </div>
+              <div class="text-danger display-6"><i class="bi bi-droplet-half"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-6 col-md-3">
+        <div class="card stat-card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h5 class="mb-1">Low Stock Alerts</h5>
+                <div class="h3 mb-0 text-warning" id="stat-alerts">3</div>
+                <div class="muted-small">groups below threshold</div>
+              </div>
+              <div class="text-danger display-6"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls row -->
+    <div class="row mb-4">
+      <div class="col-md-8">
+        <div class="input-group">
+          <input id="adminSearch" type="search" class="form-control" placeholder="Search donors, requests, hospitals..." />
+          <button id="adminSearchBtn" class="btn btn-danger"><i class="bi bi-search"></i> Search</button>
+          <button id="refreshBtn" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Refresh</button>
+        </div>
+      </div>
+      <div class="col-md-4 text-md-end mt-2 mt-md-0">
+        <button id="exportCsv" class="btn btn-outline-primary me-2"><i class="bi bi-download"></i> Export CSV</button>
+        <button id="createNotice" class="btn btn-danger"><i class="bi bi-bell-fill"></i> Send Alert</button>
+      </div>
+    </div>
+
+    <div class="row g-4">
+      <!-- Left: Requests table -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Blood Requests</h5>
+            <small class="small-muted">Showing latest 10</small>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Patient</th>
+                    <th>Group</th>
+                    <th>Units</th>
+                    <th>Hospital</th>
+                    <th>District</th>
+                    <th>Requested</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="requestsTableBody">
+                  <!-- JS will inject rows; sample rows below for UI -->
+                  <tr>
+                    <td>23</td>
+                    <td>Fatima Begum</td>
+                    <td>A+</td>
+                    <td>2</td>
+                    <td>City General</td>
+                    <td>Sylhet</td>
+                    <td>2025-09-22</td>
+                    <td><span class="badge badge-pending">Pending</span></td>
+                    <td class="text-end table-actions">
+                      <button class="btn btn-sm btn-outline-success" onclick="handleApprove(1023)">Approve</button>
+                      <button class="btn btn-sm btn-outline-secondary" onclick="handleView(1023)">View</button>
+                      <button class="btn btn-sm btn-outline-danger" onclick="handleReject(1023)">Reject</button>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td>48</td>
+                    <td>Sajjad Miah</td>
+                    <td>O-</td>
+                    <td>1</td>
+                    <td>General Hospital</td>
+                    <td>Dhaka</td>
+                    <td>2025-09-21</td>
+                    <td><span class="badge badge-approved">Matched</span></td>
+                    <td class="text-end table-actions">
+                      <button class="btn btn-sm btn-outline-secondary" onclick="handleView(1018)">View</button>
+                    </td>
+                  </tr>
+
+                  <!-- more rows inserted dynamically -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Donation activity timeline -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-header">
+            <h6 class="mb-0">Recent Activity</h6>
+          </div>
+          <div class="card-body">
+            <ul class="list-unstyled mb-0 scroll-box" id="activityList">
+              <li class="mb-3"><strong>2025-09-22:</strong> 5 units added to inventory (A+)</li>
+              <li class="mb-3"><strong>2025-09-21:</strong> Request #1018 matched with donor #42</li>
+              <li class="mb-3"><strong>2025-09-20:</strong> Low stock alert for O- and AB-</li>
+              <li><small class="muted-small">More events will appear here when connected to the live system.</small></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Inventory & quick actions -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Inventory Snapshot</h6>
+            <small class="small-muted">Updated just now</small>
+          </div>
+          <div class="card-body">
+            <div class="mb-2 d-flex justify-content-between"><div>O+</div><div><strong id="inv-O+">120</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>A+</div><div><strong id="inv-A+">88</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>B+</div><div><strong id="inv-B+">76</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>O-</div><div><strong id="inv-O-">20</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>AB-</div><div><strong id="inv-AB-">6</strong></div></div>
+
+            <div class="d-grid mt-3">
+              <button class="btn btn-outline-primary" onclick="handleAdjustInventory()">Adjust Inventory</button>
+              <button class="btn btn-outline-danger mt-2" onclick="handleLowStockReport()">Low Stock Report</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h6 class="mb-0">Quick Matches</h6>
+            <small class="small-muted">Auto-suggest</small>
+          </div>
+          <div class="card-body card-overflow">
+            <ul class="list-group list-group-flush" id="matchSuggestions">
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Donor #42 — Sajjad Miah <span class="badge bg-light text-dark">B+</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Donor #87 — Anika Rahman <span class="badge bg-light text-dark">A+</span>
+              </li>
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                Donor #113 — Karim Hossain <span class="badge bg-light text-dark">O-</span>
+              </li>
+              <li class="mt-2 small-muted">Suggestions updated when connected to live matching engine.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 mt-auto">
+    <div class="container text-center small">
+      &copy; 2025 RoktoNet. Admin actions are logged for audit.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Page JS (frontend-only simulation and helpers) -->
+  <script>
+    // Sample client-side handlers for UI interactions (frontend-only)
+    function handleApprove(id) {
+      if (!confirm('Approve request #' + id + '?')) return;
+      // simulate approve action
+      alert('Request #' + id + ' approved (frontend simulation).');
+      // update UI: change badge in table if present
+      const rows = document.querySelectorAll('#requestsTableBody tr');
+      rows.forEach(r => {
+        if (r.firstElementChild && r.firstElementChild.textContent.trim() == String(id)) {
+          const badge = r.querySelector('td:nth-child(8) span');
+          if (badge) { badge.className = 'badge badge-approved'; badge.textContent = 'Matched'; }
+          // remove approve button
+          const approveBtn = r.querySelector('.btn-outline-success');
+          if (approveBtn) approveBtn.remove();
+        }
+      });
+    }
+
+    function handleReject(id) {
+      if (!confirm('Reject request #' + id + '?')) return;
+      alert('Request #' + id + ' rejected (frontend simulation).');
+      const rows = document.querySelectorAll('#requestsTableBody tr');
+      rows.forEach(r => {
+        if (r.firstElementChild && r.firstElementChild.textContent.trim() == String(id)) {
+          const badge = r.querySelector('td:nth-child(8) span');
+          if (badge) { badge.className = 'badge badge-rejected'; badge.textContent = 'Rejected'; }
+        }
+      });
+    }
+
+    function handleView(id) {
+      // navigate to a static request details page (or popup)
+      window.location.href = `request/${id}.html`;
+    }
+
+    function handleAdjustInventory() {
+      alert('Open inventory adjustment modal (frontend simulation).');
+    }
+
+    function handleLowStockReport() {
+      alert('Generate low stock report (frontend simulation).');
+    }
+
+    // Search and refresh (simulate)
+    document.getElementById('adminSearchBtn').addEventListener('click', () => {
+      const q = document.getElementById('adminSearch').value.trim();
+      alert('Search for: ' + (q || '(empty)') + ' (frontend simulation).');
+    });
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      alert('Refreshing dashboard data (frontend simulation).');
+    });
+
+    // Export CSV (frontend only): create CSV from sample table rows
+    document.getElementById('exportCsv').addEventListener('click', () => {
+      const rows = [
+        ['id','patient','group','units','hospital','district','date','status'],
+        ['1023','Fatima Begum','A+','2','City General','Sylhet','2025-09-22','Pending'],
+        ['1018','Karim Hossain','O-','1','General Hospital','Dhaka','2025-09-21','Matched']
+      ];
+      const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = 'requests_export.csv';
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Send alert (simulate)
+    document.getElementById('createNotice').addEventListener('click', () => {
+      const msg = prompt('Compose alert message to donors (frontend simulation):', 'Urgent: O- donors needed in Dhaka.');
+      if (msg) alert('Alert sent (frontend simulation): ' + msg);
+    });
+
+    // Initial console hint
+    console.info('Admin dashboard loaded. This is a frontend-only mock. Connect to backend APIs to make actions real.');
+  </script>
+</body>
+</html>
