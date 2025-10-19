@@ -34,7 +34,7 @@ This is a web-based project for managing blood donors, requests, and administrat
 | `request_blood.html` | User: Form to request blood           |
 | `view_requests.html` | Admin: List of blood requests         |
 | `contact.html`     | Contact form                            |
-| `base.html`        | Common layout file for all pages        |
+
 
 ---
 
@@ -91,7 +91,6 @@ http://127.0.0.1:5000/
 │   ├── js/
 │   └── images/
 ├── templates/
-│   ├── base.html
 │   ├── index.html
 │   ├── login.html
 │   ├── register.html
