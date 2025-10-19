@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Contact Us – RoktoNet</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css"/>
+
+  <style>
+    .required:after { content:" *"; color:#d00; }
+    .muted-small { font-size:0.9rem; color:#6c757d; }
+    .contact-info i { font-size:1.2rem; width:24px; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><i class="bi bi-heart-fill me-1"></i>RoktoNet</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="donor_register.html"><i class="bi bi-person-plus me-1"></i>Donor</a></li>
+          <li class="nav-item"><a class="nav-link" href="recipient_register.html"><i class="bi bi-person-heart me-1"></i>Recipient</a></li>
+          <li class="nav-item"><a class="nav-link active" href="contact.html"><i class="bi bi-envelope me-1"></i>Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="flex-grow-1 container py-5">
+    <div class="row g-4">
+      <!-- Contact Form -->
+      <div class="col-lg-7">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h3 class="card-title mb-3">Get in Touch</h3>
+            <p class="muted-small mb-4">Have a question or need support? Fill out the form below and we’ll get back to you.</p>
+
+            <form id="contactForm" class="needs-validation" novalidate>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="name" class="form-label required">Your Name</label>
+                  <input type="text" id="name" name="name" class="form-control" required/>
+                  <div class="invalid-feedback">Please enter your name.</div>
+                </div>
+                <div class="col-md-6">
+                  <label for="email" class="form-label required">Email</label>
+                  <input type="email" id="email" name="email" class="form-control" required/>
+                  <div class="invalid-feedback">Please enter a valid email.</div>
+                </div>
+                <div class="col-12">
+                  <label for="subject" class="form-label required">Subject</label>
+                  <input type="text" id="subject" name="subject" class="form-control" required/>
+                  <div class="invalid-feedback">Please enter a subject.</div>
+                </div>
+                <div class="col-12">
+                  <label for="message" class="form-label required">Message</label>
+                  <textarea id="message" name="message" class="form-control" rows="5" required></textarea>
+                  <div class="invalid-feedback">Please enter your message.</div>
+                </div>
+                <div class="col-12">
+                  <div id="formAlert" class="alert d-none" role="alert"></div>
+                </div>
+                <div class="col-12 d-grid">
+                  <button type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-send me-1"></i> Send Message
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Info -->
+      <div class="col-lg-5">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body contact-info">
+            <h5 class="card-title mb-3">Contact Information</h5>
+            <p><i class="bi bi-geo-alt-fill text-danger me-2"></i>Sylhet, Bangladesh</p>
+            <p><i class="bi bi-telephone-fill text-danger me-2"></i> +880 1XXX-XXXXXX</p>
+            <p><i class="bi bi-envelope-fill text-danger me-2"></i> support@roktonet.org</p>
+            <p><i class="bi bi-clock-fill text-danger me-2"></i> Mon–Fri: 9:00 AM – 6:00 PM</p>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h5 class="card-title mb-3">Find Us</h5>
+            <div class="ratio ratio-16x9">
+              <!-- Replace src with actual Google Maps embed link -->
+              <iframe src="https://maps.google.com/maps?q=Chattogram,%20Bangladesh&t=&z=13&ie=UTF8&iwloc=&output=embed" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 mt-auto">
+    <div class="container text-center small">
+      &copy; 2025 RoktoNet. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Page JS: frontend-only validation + simulated send -->
+  <script>
+    const form = document.getElementById('contactForm');
+    const formAlert = document.getElementById('formAlert');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      form.classList.add('was-validated');
+
+      if (!form.checkValidity()) {
+        formAlert.className = 'alert alert-danger';
+        formAlert.textContent = 'Please fix the errors before sending.';
+        formAlert.classList.remove('d-none');
+        return;
+      }
+
+      formAlert.className = 'alert alert-info';
+      formAlert.textContent = 'Sending message...';
+      formAlert.classList.remove('d-none');
+
+      // Simulate API call
+      try {
+        await new Promise(r => setTimeout(r, 800));
+        formAlert.className = 'alert alert-success';
+        formAlert.textContent = 'Message sent successfully. We will contact you soon.';
+        form.reset();
+        form.classList.remove('was-validated');
+      } catch (err) {
+        formAlert.className = 'alert alert-danger';
+        formAlert.textContent = 'Error sending message (frontend simulation).';
+      }
+    });
+  </script>
+</body>
+</html>
