@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Donors – RoktoNet Admin</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .avatar-xs { width:40px; height:40px; object-fit:cover; border-radius:50%; }
+    .muted-small { font-size:0.9rem; color:#6c757d; }
+    .table-actions .btn { padding: .25rem .5rem; }
+    .badge-active { background:#198754; color:#fff; }
+    .badge-inactive { background:#6c757d; color:#fff; }
+    .badge-flagged { background:#ffc107; color:#000; }
+    .scroll-box { max-height:350px; overflow:auto; }
+    .small-muted { font-size:0.85rem; color:#6c757d; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <div class="container-fluid">
+      <a class="navbar-brand ms-3" href="admin_dashboard.html"><i class="bi bi-heart-fill me-1"></i>RoktoNet Admin</a>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto me-3">
+          <li class="nav-item"><a class="nav-link" href="admin_dashboard.html"><i class="bi bi-speedometer2 me-1"></i>Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link active" href="manage_donors.html"><i class="bi bi-people me-1"></i>Manage Donors</a></li>
+          <li class="nav-item"><a class="nav-link" href="requests.html"><i class="bi bi-file-earmark-text me-1"></i>Requests</a></li>
+          <li class="nav-item"><a class="nav-link" href="inventory.html"><i class="bi bi-droplet-half me-1"></i>Inventory</a></li>
+          <li class="nav-item"><a class="nav-link" href="admin_login.html"><i class="bi bi-box-arrow-right me-1"></i>Logout</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="flex-grow-1 container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="mb-0">Manage Donors</h3>
+      <div class="small-muted">View, search, and perform bulk actions on donors</div>
+    </div>
+
+    <!-- Controls -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input id="searchInput" type="search" class="form-control" placeholder="Search by name, email, phone, district" />
+          <select id="filterBlood" class="form-select w-auto">
+            <option value="">All blood groups</option>
+            <option value="A+">A+</option><option value="A-">A-</option>
+            <option value="B+">B+</option><option value="B-">B-</option>
+            <option value="O+">O+</option><option value="O-">O-</option>
+            <option value="AB+">AB+</option><option value="AB-">AB-</option>
+          </select>
+          <button id="searchBtn" class="btn btn-danger"><i class="bi bi-search"></i></button>
+        </div>
+      </div>
+
+      <div class="col-md-6 text-md-end">
+        <div class="d-inline-block me-2">
+          <button id="bulkActivate" class="btn btn-outline-success btn-sm me-1">Activate</button>
+          <button id="bulkDeactivate" class="btn btn-outline-secondary btn-sm me-1">Deactivate</button>
+          <button id="bulkDelete" class="btn btn-outline-danger btn-sm">Delete</button>
+        </div>
+        <button id="exportBtn" class="btn btn-outline-primary btn-sm ms-2"><i class="bi bi-download"></i> Export CSV</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- Left: table -->
+      <div class="col-lg-8">
+        <div class="card shadow-sm">
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0 align-middle">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width:40px"><input id="selectAll" type="checkbox" /></th>
+                    <th>#</th>
+                    <th>Donor</th>
+                    <th>Blood</th>
+                    <th>District</th>
+                    <th>Last Donation</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="donorsTableBody">
+                  <!-- JS populates rows; sample row below -->
+                  <tr>
+                    <td><input class="row-checkbox" data-id="42" type="checkbox" /></td>
+                    <td>42</td>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="/static/images/avatar-placeholder.png" class="avatar-xs me-2" alt="">
+                        <div>
+                          <div class="fw-semibold">John Doe</div>
+                          <div class="muted-small">john.doe@example.com</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>A+</td>
+                    <td>Chattogram</td>
+                    <td>2025-08-15</td>
+                    <td><span class="badge badge-active">Active</span></td>
+                    <td class="text-end table-actions">
+                      <button class="btn btn-sm btn-outline-secondary" onclick="viewDonor(42)"><i class="bi bi-eye"></i></button>
+                      <button class="btn btn-sm btn-outline-primary" onclick="editDonor(42)"><i class="bi bi-pencil"></i></button>
+                      <button class="btn btn-sm btn-outline-danger" onclick="deleteDonor(42)"><i class="bi bi-trash"></i></button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <div class="small-muted" id="tableInfo">Showing 1 of 1 donors (sample)</div>
+            <nav id="paginationNav" aria-label="Donor pagination"></nav>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: details & quick stats -->
+      <aside class="col-lg-4">
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <h6 class="card-title">Filters Summary</h6>
+            <div class="mb-2"><strong>Blood Group:</strong> <span id="summaryBlood">All</span></div>
+            <div class="mb-2"><strong>Search:</strong> <span id="summaryQuery">—</span></div>
+            <div class="mb-2"><strong>Selected:</strong> <span id="summarySelected">0</span></div>
+            <div class="small-muted">Use bulk actions above for the selected donors.</div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
+          <div class="card-header">
+            <h6 class="mb-0">Quick Stats</h6>
+          </div>
+          <div class="card-body">
+            <div class="mb-2 d-flex justify-content-between"><div>Total Donors</div><div><strong id="statTotal">1</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>Active</div><div><strong id="statActive">1</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>Inactive</div><div><strong id="statInactive">0</strong></div></div>
+            <div class="mb-2 d-flex justify-content-between"><div>Flagged</div><div><strong id="statFlagged">0</strong></div></div>
+          </div>
+        </div>
+
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h6 class="card-title">Dev Tools</h6>
+            <div class="d-grid">
+              <button id="useSampleBtn" class="btn btn-outline-primary btn-sm">Use Embedded Sample Data</button>
+              <button id="useMockBtn" class="btn btn-outline-secondary btn-sm">Use Local Mock JSON</button>
+              <button id="clearSelection" class="btn btn-outline-danger btn-sm">Clear Selection</button>
+            </div>
+            <pre id="debugLog" class="small mt-2" style="display:none; white-space:pre-wrap;"></pre>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-3 mt-auto">
+    <div class="container text-center small">
+      &copy; 2025 RoktoNet Admin
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Page JS: frontend-only management logic with mock/sample options -->
+  <script>
+    // Config / state
+    const API_LIST = '/api/donors'; // GET with query params
+    const API_DELETE = id => `/api/donors/${id}`; // DELETE
+    let useMock = false;
+    let useSample = false;
+
+    const searchInput = document.getElementById('searchInput');
+    const filterBlood = document.getElementById('filterBlood');
+    const searchBtn = document.getElementById('searchBtn');
+    const donorsTableBody = document.getElementById('donorsTableBody');
+    const tableInfo = document.getElementById('tableInfo');
+    const paginationNav = document.getElementById('paginationNav');
+    const summaryBlood = document.getElementById('summaryBlood');
+    const summaryQuery = document.getElementById('summaryQuery');
+    const summarySelected = document.getElementById('summarySelected');
+
+    const statTotal = document.getElementById('statTotal');
+    const statActive = document.getElementById('statActive');
+    const statInactive = document.getElementById('statInactive');
+    const statFlagged = document.getElementById('statFlagged');
+
+    const selectAll = document.getElementById('selectAll');
+    const bulkActivate = document.getElementById('bulkActivate');
+    const bulkDeactivate = document.getElementById('bulkDeactivate');
+    const bulkDelete = document.getElementById('bulkDelete');
+    const exportBtn = document.getElementById('exportBtn');
+    const useSampleBtn = document.getElementById('useSampleBtn');
+    const useMockBtn = document.getElementById('useMockBtn');
+    const clearSelection = document.getElementById('clearSelection');
+    const debugLog = document.getElementById('debugLog');
+
+    let state = { page:1, per_page:10, total:0, donors:[] };
+    let lastFetch = null;
+
+    function esc(s){ return s==null ? '' : String(s); }
+
+    // Render table rows from state.donors
+    function renderTable() {
+      donorsTableBody.innerHTML = '';
+      if (!state.donors.length) {
+        donorsTableBody.innerHTML = '<tr><td colspan="8"><div class="alert alert-info mb-0">No donors found.</div></td></tr>';
+        paginationNav.innerHTML = '';
+        tableInfo.textContent = '0 donors';
+        updateStats();
+        return;
+      }
+
+      state.donors.forEach(d => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><input class="row-checkbox" data-id="${esc(d.id)}" type="checkbox" /></td>
+          <td>${esc(d.id)}</td>
+          <td>
+            <div class="d-flex align-items-center">
+              <img src="${esc(d.avatar_url || '/static/images/avatar-placeholder.png')}" class="avatar-xs me-2" alt="">
+              <div><div class="fw-semibold">${esc(d.full_name)}</div><div class="muted-small">${esc(d.email || '')}</div></div>
+            </div>
+          </td>
+          <td>${esc(d.blood_group || '')}</td>
+          <td>${esc(d.district || '')}</td>
+          <td>${esc(d.last_donation || 'N/A')}</td>
+          <td>${renderStatusBadge(d.status || (d.is_active ? 'Active' : 'Inactive'))}</td>
+          <td class="text-end table-actions">
+            <button class="btn btn-sm btn-outline-secondary" onclick="viewDonor(${esc(d.id)})"><i class="bi bi-eye"></i></button>
+            <button class="btn btn-sm btn-outline-primary" onclick="editDonor(${esc(d.id)})"><i class="bi bi-pencil"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteDonor(${esc(d.id)})"><i class="bi bi-trash"></i></button>
+          </td>`;
+        donorsTableBody.appendChild(tr);
+      });
+
+      // attach checkbox handlers
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.addEventListener('change', updateSelectionSummary));
+      selectAll.checked = false;
+      updateSelectionSummary();
+      tableInfo.textContent = `Showing ${state.donors.length} donors (page ${state.page})`;
+      renderPagination();
+      updateStats();
+    }
+
+    function renderStatusBadge(status) {
+      status = String(status).toLowerCase();
+      if (status.includes('active')) return '<span class="badge badge-active">Active</span>';
+      if (status.includes('flag')) return '<span class="badge badge-flagged">Flagged</span>';
+      return '<span class="badge badge-inactive">Inactive</span>';
+    }
+
+    function renderPagination() {
+      const pages = Math.ceil((state.total || state.donors.length) / state.per_page) || 1;
+      let html = '<ul class="pagination pagination-sm mb-0">';
+      html += `<li class="page-item ${state.page<=1?'disabled':''}"><a class="page-link" href="#" data-page="${state.page-1}">Prev</a></li>`;
+      for (let p=1;p<=pages;p++){
+        html += `<li class="page-item ${p===state.page?'active':''}"><a class="page-link" href="#" data-page="${p}">${p}</a></li>`;
+      }
+      html += `<li class="page-item ${state.page>=pages?'disabled':''}"><a class="page-link" href="#" data-page="${state.page+1}">Next</a></li>`;
+      html += '</ul>';
+      paginationNav.innerHTML = html;
+      paginationNav.querySelectorAll('a.page-link').forEach(a=>{
+        a.addEventListener('click', (e)=>{
+          e.preventDefault();
+          const p = parseInt(a.getAttribute('data-page'));
+          if (!isNaN(p) && p>=1) { state.page = p; loadDonors(); }
+        });
+      });
+    }
+
+    function updateSelectionSummary() {
+      const selected = document.querySelectorAll('.row-checkbox:checked').length;
+      summarySelected.textContent = selected;
+    }
+
+    function updateStats() {
+      const total = state.total || state.donors.length;
+      statTotal.textContent = total;
+      const active = (state.donors || []).filter(d => d.is_active).length;
+      statActive.textContent = active;
+      statInactive.textContent = ((state.donors || []).length - active);
+      statFlagged.textContent = (state.donors || []).filter(d => d.flagged).length;
+    }
+
+    // Load donors: real API or sample
+    async function loadDonors() {
+      summaryBlood.textContent = filterBlood.value || 'All';
+      summaryQuery.textContent = searchInput.value.trim() || '—';
+      if (useSample) { sampleLoad(); return; }
+
+      const params = new URLSearchParams();
+      params.set('page', state.page);
+      params.set('per_page', state.per_page);
+      if (searchInput.value) params.set('q', searchInput.value.trim());
+      if (filterBlood.value) params.set('blood_group', filterBlood.value);
+
+      const url = useMock ? `/static/mock/donors.json?${params.toString()}` : `${API_LIST}?${params.toString()}`;
+      lastFetch = { url, time: new Date().toISOString() };
+
+      try {
+        const res = await fetch(url);
+        lastFetch.status = res.status; lastFetch.ok = res.ok;
+        const text = await res.text();
+        let data;
+        try { data = JSON.parse(text || '{}'); } catch(e) { data = null; }
+        if (!res.ok || !data) {
+          console.error('Failed to fetch donors', lastFetch, text);
+          donorsTableBody.innerHTML = `<tr><td colspan="8"><div class="alert alert-danger mb-0">Could not load donors. Check API or use sample/mock.</div></td></tr>`;
+          paginationNav.innerHTML = '';
+          return;
+        }
+        state.total = data.total || data.count || (data.donors ? data.donors.length : 0);
+        state.page = data.page || state.page;
+        state.per_page = data.per_page || state.per_page;
+        state.donors = data.donors || data.results || [];
+        renderTable();
+      } catch (err) {
+        console.error('Network error', err, lastFetch);
+        donorsTableBody.innerHTML = `<tr><td colspan="8"><div class="alert alert-danger mb-0">Network error while loading donors. Use sample/mock for frontend testing.</div></td></tr>`;
+        paginationNav.innerHTML = '';
+      }
+    }
+
+    // CRUD action stubs (frontend-only)
+    window.viewDonor = function(id) {
+      window.location.href = `/donor/${id}`;
+    };
+    window.editDonor = function(id) {
+      window.location.href = `/donor/${id}/edit`;
+    };
+    window.deleteDonor = async function(id) {
+      if (!confirm('Delete donor #' + id + '? This action cannot be undone.')) return;
+      // Try calling DELETE on backend, if fails simulate
+      try {
+        const res = await fetch(API_DELETE(id), { method: 'DELETE' });
+        if (!res.ok) throw new Error('Server rejected');
+        alert('Deleted donor #' + id);
+        loadDonors();
+      } catch (err) {
+        alert('Simulated delete (backend not available). Removing from UI.');
+        state.donors = state.donors.filter(d => d.id != id);
+        renderTable();
+      }
+    };
+
+    // Bulk actions
+    function getSelectedIds() {
+      return Array.from(document.querySelectorAll('.row-checkbox:checked')).map(cb => cb.getAttribute('data-id'));
+    }
+    bulkActivate.addEventListener('click', ()=> {
+      const ids = getSelectedIds(); if (!ids.length) return alert('Select donors first.');
+      alert('Simulated activate for ids: ' + ids.join(', '));
+      state.donors.forEach(d => { if (ids.includes(String(d.id))) d.is_active = true; });
+      renderTable();
+    });
+    bulkDeactivate.addEventListener('click', ()=> {
+      const ids = getSelectedIds(); if (!ids.length) return alert('Select donors first.');
+      alert('Simulated deactivate for ids: ' + ids.join(', '));
+      state.donors.forEach(d => { if (ids.includes(String(d.id))) d.is_active = false; });
+      renderTable();
+    });
+    bulkDelete.addEventListener('click', ()=> {
+      const ids = getSelectedIds(); if (!ids.length) return alert('Select donors first.');
+      if (!confirm('Delete selected donors?')) return;
+      alert('Simulated bulk delete for: ' + ids.join(', '));
+      state.donors = state.donors.filter(d => !ids.includes(String(d.id)));
+      renderTable();
+    });
+
+    // Export CSV from current state
+    exportBtn.addEventListener('click', () => {
+      const rows = [['id','full_name','email','phone','blood_group','district','last_donation','status']];
+      (state.donors || []).forEach(d => {
+        rows.push([d.id,d.full_name,d.email||'',d.phone||'',d.blood_group||'',d.district||'',d.last_donation||'', d.is_active ? 'Active' : 'Inactive']);
+      });
+      const csv = rows.map(r => r.map(c => `"${String(c).replace(/"/g,'""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'donors_export.csv'; document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(url);
+    });
+
+    // Select all
+    selectAll.addEventListener('change', ()=> {
+      const checked = selectAll.checked;
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = checked);
+      updateSelectionSummary();
+    });
+    clearSelection.addEventListener('click', ()=> {
+      document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = false);
+      updateSelectionSummary();
+    });
+
+    // Dev controls
+    useSampleBtn.addEventListener('click', ()=> { useSample = true; useMock = false; useSampleBtn.classList.add('active'); useMockBtn.classList.remove('active'); loadDonors(); });
+    useMockBtn.addEventListener('click', ()=> { useMock = true; useSample = false; useMockBtn.classList.add('active'); useSampleBtn.classList.remove('active'); loadDonors(); });
+
+    // Search handlers
+    searchBtn.addEventListener('click', ()=> { state.page = 1; loadDonors(); });
+    searchInput.addEventListener('keydown', (e)=> { if (e.key === 'Enter') { e.preventDefault(); state.page = 1; loadDonors(); } });
+
+    // Embedded sample data for frontend testing
+    function sampleLoad() {
+      state.page = 1; state.per_page = 10;
+      state.donors = [
+        {id:42, full_name:'John Doe', email:'john.doe@example.com', phone:'+8801XXXXXXXXX', blood_group:'A+', district:'Chattogram', last_donation:'2025-08-15', is_active:true},
+        {id:87, full_name:'Anika Rahman', email:'anika@example.com', phone:'+8801YYYYYYYYY', blood_group:'B+', district:'Dhaka', last_donation:'2025-07-01', is_active:true},
+        {id:113, full_name:'Karim Hossain', email:'karim@example.com', phone:null, blood_group:'O-', district:'Sylhet', last_donation:null, is_active:false, flagged:true}
+      ];
+      state.total = state.donors.length;
+      renderTable();
+      lastFetch = { mode:'sample', time: new Date().toISOString(), note:'sampleLoad used' };
+      debugLog.textContent = JSON.stringify(lastFetch, null, 2); debugLog.style.display = 'none';
+    }
+
+    // Initial load: try real API (if available), fallback not automatic so developer can toggle sample/mock
+    document.addEventListener('DOMContentLoaded', ()=> {
+      loadDonors().then(()=> {
+        // if API failed, UI displays error; use "Use Embedded Sample Data" to view sample
+        debugLog.textContent = JSON.stringify(lastFetch, null, 2);
+      });
+    });
+  </script>
+</body>
+</html>

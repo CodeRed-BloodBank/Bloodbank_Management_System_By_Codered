@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Request Blood – RoktoNet</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"/>
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/css/style.css" />
+
+  <style>
+    .muted-small { font-size:0.9rem; color:#6c757d; }
+    .required:after { content: " *"; color: #d00; }
+  </style>
+</head>
+<body class="d-flex flex-column min-vh-100">
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="index.html"><i class="bi bi-heart-fill me-1"></i>RoktoNet</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html"><i class="bi bi-house-door-fill me-1"></i>Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="donor_register.html"><i class="bi bi-person-plus me-1"></i>Donor</a></li>
+          <li class="nav-item"><a class="nav-link" href="recipient_register.html"><i class="bi bi-person-heart me-1"></i>Recipient</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html"><i class="bi bi-box-arrow-in-right me-1"></i>Login</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main -->
+  <main class="flex-grow-1 container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <h3 class="card-title mb-2">Request Blood</h3>
+            <p class="muted-small mb-3">Fill the form below to create a new blood request. Fields marked with <span class="text-danger">*</span> are required.</p>
+
+            <form id="requestForm" class="needs-validation" novalidate>
+              <div class="row g-3">
+
+                <div class="col-md-6">
+                  <label for="patient_name" class="form-label required">Patient Full Name</label>
+                  <input type="text" class="form-control" id="patient_name" name="patient_name" required />
+                  <div class="invalid-feedback">Please enter the patient's full name.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="relation" class="form-label">Relation to Patient</label>
+                  <input type="text" class="form-control" id="relation" name="relation" placeholder="e.g., Father, Self, Friend" />
+                </div>
+
+                <div class="col-md-4">
+                  <label for="blood_group" class="form-label required">Blood Group</label>
+                  <select id="blood_group" name="blood_group" class="form-select" required>
+                    <option value="">Select group</option>
+                    <option value="A+">A+</option><option value="A-">A-</option>
+                    <option value="B+">B+</option><option value="B-">B-</option>
+                    <option value="O+">O+</option><option value="O-">O-</option>
+                    <option value="AB+">AB+</option><option value="AB-">AB-</option>
+                  </select>
+                  <div class="invalid-feedback">Please select a blood group.</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="units" class="form-label required">Units Required</label>
+                  <input type="number" id="units" name="units" class="form-control" min="1" value="1" required />
+                  <div class="invalid-feedback">Enter number of units required.</div>
+                </div>
+
+                <div class="col-md-4">
+                  <label for="required_date" class="form-label required">Required Date</label>
+                  <input type="date" id="required_date" name="required_date" class="form-control" required />
+                  <div class="invalid-feedback">Please select the date when blood is needed.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="hospital" class="form-label required">Hospital / Clinic</label>
+                  <input type="text" id="hospital" name="hospital" class="form-control" placeholder="Hospital name and ward" required />
+                  <div class="invalid-feedback">Enter hospital or clinic name.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="doctor" class="form-label">Doctor Name</label>
+                  <input type="text" id="doctor" name="doctor" class="form-control" placeholder="Attending doctor (optional)" />
+                </div>
+
+                <div class="col-md-6">
+                  <label for="district" class="form-label required">District</label>
+                  <select id="district" name="district" class="form-select" required>
+                    <option value="">Select district</option>
+                    <option>Dhaka</option><option>Chattogram</option><option>Sylhet</option><option>Rajshahi</option>
+                    <!-- add more as needed -->
+                  </select>
+                  <div class="invalid-feedback">Please select the district.</div>
+                </div>
+
+                <div class="col-md-6">
+                  <label for="phone" class="form-label required">Contact Phone</label>
+                  <input type="tel" id="phone" name="phone" class="form-control" placeholder="+8801XXXXXXXXX" required />
+                  <div class="invalid-feedback">Please enter a contact phone number.</div>
+                </div>
+
+                <div class="col-12">
+                  <label for="notes" class="form-label">Additional Notes</label>
+                  <textarea id="notes" name="notes" class="form-control" rows="3" placeholder="Any special instructions, blood product type, urgency details..."></textarea>
+                </div>
+
+                <div class="col-12">
+                  <div id="formAlert" class="alert d-none" role="alert"></div>
+                </div>
+
+                <div class="col-12 d-grid">
+                  <button id="submitBtn" type="submit" class="btn btn-danger btn-lg">
+                    <i class="bi bi-send-check me-1"></i> Submit Request
+                  </button>
+                </div>
+
+              </div>
+            </form>
+
+            <hr class="my-4" />
+
+            <div class="muted-small">
+              By submitting, you confirm that the information provided is accurate to the best of your knowledge. For urgent cases, please contact the hospital directly and follow medical advice.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4 mt-auto">
+    <div class="container d-flex flex-column flex-md-row justify-content-between">
+      <div>
+        <h6>Quick Links</h6>
+        <ul class="list-unstyled">
+          <li><a href="index.html" class="text-white">Home</a></li>
+          <li><a href="donor_register.html" class="text-white">Become a Donor</a></li>
+          <li><a href="recpient_register.html" class="text-white">Become a Recipient</a></li>
+        </ul>
+      </div>
+      <div class="text-md-end mt-3 mt-md-0">
+        <p class="mb-1">&copy; 2025 RoktoNet. All rights reserved.</p>
+        <a href="privacy.html" class="text-white me-2">Privacy Policy</a>
+        <a href="terms.html" class="text-white">Terms of Service</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Frontend-only JS: client validation + sample POST / fallback -->
+  <script>
+    // Configuration: API endpoint for creating requests
+    const API_CREATE = '/api/requests'; // backend should accept POST JSON and respond with created resource
+
+    const form = document.getElementById('requestForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const formAlert = document.getElementById('formAlert');
+
+    // Bootstrap validation
+    (function () {
+      'use strict';
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        form.classList.add('was-validated');
+
+        if (!form.checkValidity()) {
+          formAlert.className = 'alert alert-danger';
+          formAlert.textContent = 'Please fix the errors in the form before submitting.';
+          formAlert.classList.remove('d-none');
+          return;
+        }
+
+        formAlert.className = 'alert alert-info';
+        formAlert.textContent = 'Submitting request...';
+        formAlert.classList.remove('d-none');
+
+        // collect payload
+        const payload = {
+          patient_name: form.patient_name.value.trim(),
+          relation: form.relation.value.trim(),
+          blood_group: form.blood_group.value,
+          units: Number(form.units.value) || 1,
+          required_date: form.required_date.value,
+          hospital: form.hospital.value.trim(),
+          doctor: form.doctor.value.trim(),
+          district: form.district.value,
+          phone: form.phone.value.trim(),
+          notes: form.notes.value.trim()
+        };
+
+        // Try to POST to backend API. If backend not available, fallback to local simulation.
+        try {
+          const res = await fetch(API_CREATE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) {
+            // show server message if provided
+            let text = await res.text().catch(()=>null);
+            formAlert.className = 'alert alert-danger';
+            formAlert.innerHTML = `Server error (${res.status}). ${text ? 'Message: ' + text : ''}`;
+            return;
+          }
+
+          // on success, try to parse JSON and redirect or show success
+          let data;
+          try { data = await res.json(); } catch(e){ data = null; }
+          formAlert.className = 'alert alert-success';
+          formAlert.innerHTML = 'Request submitted successfully.';
+
+          // If backend returned a detail URL or id, redirect to request page
+          if (data && data.id) {
+            const redirect = data.url || `/request/${data.id}`;
+            formAlert.innerHTML += ` Redirecting to <a href="${redirect}">request page</a>...`;
+            setTimeout(()=> window.location.href = redirect, 1200);
+          } else {
+            // clear form after short delay
+            setTimeout(()=> { form.reset(); form.classList.remove('was-validated'); formAlert.classList.add('d-none'); }, 1400);
+          }
+
+        } catch (err) {
+          // Fallback for development when backend is not ready
+          console.error('POST error', err);
+          formAlert.className = 'alert alert-warning';
+          formAlert.innerHTML = 'Could not reach server. Simulating success for frontend testing.';
+          // Simulate created object and redirect to a static recipient_profile page
+          setTimeout(()=> {
+            formAlert.classList.add('d-none');
+            // redirect to a static sample page (change if you have a dynamic route later)
+            window.location.href = 'recipient_profile.html';
+          }, 1200);
+        }
+      }, false);
+    })();
+  </script>
+</body>
+</html>
